@@ -10,7 +10,7 @@
       <block type="face_get_description">
         <value name="description">
           <block type="text">
-            <field name="TEXT">https://marty5499.github.io/webduino-module-face-emotion/sample1.jpg</field>
+            <field name="TEXT">https://webduinoio.github.io/webduino-module-face-emotion/sample1.jpg</field>
           </block>
         </value>
       </block>
