@@ -1,6 +1,11 @@
 Blockly.JavaScript['face_load'] = function (block) {
   var dropdown_model = block.getFieldValue('model');
-  var code = 'await faceAPI.loadModel();\n';
+  const MODEL_TYPE = {
+    "0": 'ssd_mobilenetv1',
+    "1": 'tiny_face_detector',
+    "2": 'mtcnn'
+  };
+  var code = `await faceAPI.loadModel("${MODEL_TYPE[dropdown_model]}");\n`;
   return code;
 };
 
@@ -12,7 +17,7 @@ Blockly.JavaScript['face_get_description'] = function (block) {
 
 Blockly.JavaScript['face_get_emotion'] = function (block) {
   var face_URL = Blockly.JavaScript.valueToCode(block, 'emotion', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = "await faceAPI.getDescription(" + face_URL + ",true)"
+  var code = "await faceAPI.getEmotion(" + face_URL + ")"
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 

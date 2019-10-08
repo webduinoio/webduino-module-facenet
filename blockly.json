@@ -16,8 +16,6 @@
     "camera.js",
     "face-api.js",
     "face.js",
-    "tfjs@0.14.1.js",
-    "emotion.js",
     "face-blockly.js"
   ],
   "msg": "blockly/msg",
