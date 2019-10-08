@@ -17,7 +17,6 @@
 
   const SSD_MOBILENETV1 = 'ssd_mobilenetv1';
   const TINY_FACE_DETECTOR = 'tiny_face_detector';
-  const TINY_YOLOV2 = 'tiny_yolov2';
   const MTCNN = 'mtcnn';
 
   function toImage(imgBase64) {
