@@ -41,11 +41,15 @@
     console.log("MODEL_URL:", MODEL_URL);
     Module.call(this);
     this.MODEL_URL = MODEL_URL;
-    this.process = false;
+    this.processing = false;
     this.lastFaceDescriptor = [];
     this.detector = SSD_MOBILENETV1;
     this.lastFaceExpression = "";
     this.lastFaceDescriptor = [];
+
+    // for debug
+    this.debug = true;
+    this.forwardTimes = []; // debug
 
     // ssd_mobilenetv1 options
     this.minConfidence = 0.5
@@ -146,6 +150,14 @@
     }
   };
 
+  proto.fpsInfo = function (timeInMs) {
+    if (this.debug) {
+      this.forwardTimes = [timeInMs].concat(this.forwardTimes).slice(0, 30);
+      const avgTimeInMs = this.forwardTimes.reduce((total, t) => total + t) / this.forwardTimes.length;
+      console.log(`time: ${Math.round(avgTimeInMs)} ms, fps: ${faceapi.round(1000 / avgTimeInMs)}, `);
+    }
+  };
+
   proto.getEmotion = async function (image) {
     if (image == null) {
       return [];
@@ -162,7 +174,11 @@
     try {
       let handler = async () => {
         let detectorOptions = this.getFaceDetectorOptions();
+
+        const ts = Date.now()
         let result = await faceapi.detectSingleFace(input, detectorOptions).withFaceLandmarks().withFaceExpressions();
+        this.fpsInfo(Date.now() - ts);
+
         if (result) {
           let expressions = result.expressions;
           let val = Object.keys(expressions).reduce((cur, key) => {
@@ -174,9 +190,9 @@
         return "";
       };
 
-      this.processing = false;
       let data = await handler();
       this.lastFaceExpression = data || this.lastFaceExpression;
+      this.processing = false;
       return data;
 
     } catch(e) {
