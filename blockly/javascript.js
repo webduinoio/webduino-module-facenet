@@ -11,7 +11,7 @@ Blockly.JavaScript['face_load'] = function (block) {
 
 Blockly.JavaScript['face_get_description'] = function (block) {
   var face_URL = Blockly.JavaScript.valueToCode(block, 'description', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = "await faceAPI.getDescription(" + face_URL + ",false)"
+  var code = "await faceAPI.getDescription(" + face_URL + ")"
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 

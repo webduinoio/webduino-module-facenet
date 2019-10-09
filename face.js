@@ -48,7 +48,7 @@
     this.lastFaceDescriptor = [];
 
     // for debug
-    this.debug = true;
+    this.debug = false;
     this.forwardTimes = []; // debug
 
     // ssd_mobilenetv1 options
@@ -90,7 +90,7 @@
    * @param {boolean} detectEmotion
    * @returns {array | string}
    */
-  proto.getDescription = async function (image, detectEmotion) {
+  proto.getDescription = async function (image, detectEmotion = false) {
     if (image == null) {
       return [];
     }
@@ -175,7 +175,7 @@
       let handler = async () => {
         let detectorOptions = this.getFaceDetectorOptions();
 
-        const ts = Date.now()
+        const ts = Date.now();
         let result = await faceapi.detectSingleFace(input, detectorOptions).withFaceLandmarks().withFaceExpressions();
         this.fpsInfo(Date.now() - ts);
 
