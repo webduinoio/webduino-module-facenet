@@ -3,6 +3,8 @@
     "face_load",
     "face_get_canvas",
     "face_get_emotion",
+    "face_get_age",
+    "face_get_gender",
     "face_get_description",
     "face_get_euclideanDistance",
     "face_get_camera"

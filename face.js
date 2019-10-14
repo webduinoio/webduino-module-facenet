@@ -46,6 +46,8 @@
     this.detector = SSD_MOBILENETV1;
     this.lastFaceExpression = "";
     this.lastFaceDescriptor = [];
+    this.lastAgeAndGender = {};
+    this.predictedAges = [];
 
     // for debug
     this.debug = false;
@@ -205,6 +207,52 @@
     }
   };
 
+  proto.getAgeAndGender = async function (image) {
+    if (image == null) {
+      return [];
+    }
+    if (this.processing) {
+      return this.lastAgeAndGender;
+    }
+    this.processing = true;
+
+    // 處理 input
+    let input = await handleImage(image);
+
+    // 開始偵測
+    try {
+      let handler = async () => {
+        let detectorOptions = this.getFaceDetectorOptions();
+
+        const ts = Date.now();
+        let result = await faceapi.detectSingleFace(input, detectorOptions).withAgeAndGender();
+        this.fpsInfo(Date.now() - ts);
+
+        if (result) {
+          this.showCanvasInfo(input, result, {ageAndGender: true});
+          const { age, gender, genderProbability } = result;
+          const interpolatedAge = this.interpolateAgePredictions(age);
+          return {
+            age: faceapi.round(interpolatedAge, 0),
+            gender,
+            genderProbability
+          };
+        }
+        return "";
+      };
+
+      let data = await handler();
+      this.lastAgeAndGender = data || this.lastAgeAndGender;
+      this.processing = false;
+      return data || {};
+
+    } catch(e) {
+      console.log("face expression detect Error:", e);
+      this.processing = false;
+      return [];
+    }
+  };
+
   /**
    * 原來是載入所有的 model
    * 從 2019-10 後，調整為載入指定的 model，但且設定為接下來使用的 model
@@ -229,6 +277,7 @@
     }
     await faceapi.loadFaceExpressionModel(this.MODEL_URL);
     await faceapi.loadFaceLandmarkModel(this.MODEL_URL);
+    await faceapi.loadAgeGenderModel(this.MODEL_URL);
     await faceapi.loadFaceRecognitionModel(this.MODEL_URL);
     console.log("done.");
   };
@@ -276,11 +325,29 @@
   };
 
   /**
+   * 官方範例，對於偵測的年齡，做平均的方式，來呈現。
+   * interpolate gender predictions over last 30 frames
+   * to make the displayed age more stable
+   * @param {number} age
+   * @returns {number}
+   */
+  proto.interpolateAgePredictions = function (age) {
+    this.predictedAges = [age].concat(this.predictedAges).slice(0, 30)
+    const avgPredictedAge = this.predictedAges.reduce((total, a) => total + a) / this.predictedAges.length
+    return avgPredictedAge;
+  };
+
+  /**
    * debug，用來實現，像官方範例那樣，框住人臉，並且出現相關資訊
    * @param {object} input - HTMLVideoElement
    * @param {object} result - 偵測後，得到的資訊
    */
-  proto.showCanvasInfo = function (input, result, { expressions = false } = { expressions: false }) {
+  proto.showCanvasInfo = function (input, result,
+    { expressions = false, ageAndGender = false } = {
+      expressions: false,
+      ageAndGender: false
+    }) {
+
     let isVideo = input instanceof HTMLVideoElement;
     if (!this.debug || !result || !isVideo) return;
     if (!this.canvas4debug) {
@@ -299,6 +366,19 @@
     if (expressions) {
       const minConfidence = 0.05
       faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence);
+    }
+
+    // 顯示年齡及性別
+    if (ageAndGender) {
+      const { age, gender, genderProbability } = resizedResult;
+      const interpolatedAge = this.interpolateAgePredictions(age);
+      new faceapi.draw.DrawTextField(
+        [
+          `${faceapi.round(interpolatedAge, 0)} years`,
+          `${gender} (${faceapi.round(genderProbability)})`
+        ],
+        resizedResult.detection.box.bottomLeft
+      ).draw(canvas);
     }
 
   };

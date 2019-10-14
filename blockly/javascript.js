@@ -21,6 +21,18 @@ Blockly.JavaScript['face_get_emotion'] = function (block) {
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
+Blockly.JavaScript['face_get_age'] = function (block) {
+  var face_URL = Blockly.JavaScript.valueToCode(block, 'age', Blockly.JavaScript.ORDER_ATOMIC);
+  var code = "(await faceAPI.getAgeAndGender(" + face_URL + ")).age"
+  return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript['face_get_gender'] = function (block) {
+  var face_URL = Blockly.JavaScript.valueToCode(block, 'gender', Blockly.JavaScript.ORDER_ATOMIC);
+  var code = "(await faceAPI.getAgeAndGender(" + face_URL + ")).gender"
+  return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
 Blockly.JavaScript['face_get_euclideanDistance'] = function (block) {
   var face1 = Blockly.JavaScript.valueToCode(block, 'faceA', Blockly.JavaScript.ORDER_ATOMIC);
   var face2 = Blockly.JavaScript.valueToCode(block, 'faceB', Blockly.JavaScript.ORDER_ATOMIC);
