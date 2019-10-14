@@ -8,7 +8,7 @@ var Webcam = (function () {
       }
       super(camType);
       this.setCamType(camType);
-      this.setFlip(false);
+      this.flip = false;
       this.autoScale = false;
       this.setRotate(0);
     }
@@ -99,17 +99,28 @@ var Webcam = (function () {
       video.autoplay = true;
       window.remoteVideo = this.video = this.getEle(eleOrId);
       this.rotateImg(this.rotate);
+      this.flipImg(this.flip);
       this.startCam().then(callback);
       return this;
     }
 
     rotateImg(degrees) {
-      if (!degrees) {
-        this.video.style.transform = 'none';
-        return this;
-      }
-      this.video.style.transform = `rotate(${degrees}deg)`;
+      const rg = /rotate\(.+?\)/;
+      let str = this.video.style.transform;
+      str = rg.test(str) ? str.replace(rg, '') : str;
+      str += ` rotate(${degrees}deg)`;
+      this.video.style.transform = str;
       return this;
+    }
+
+    flipImg(isFlip) {
+      const rg = /scaleX\(-1\)/;
+      let str = this.video.style.transform;
+      str = rg.test(str) ? str.replace(rg, '') : str;
+      if (isFlip) {
+        str += " scaleX(-1)";
+      }
+      this.video.style.transform = str;
     }
   }
   return Webcam;
