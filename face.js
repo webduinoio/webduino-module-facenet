@@ -52,14 +52,14 @@
     this.forwardTimes = []; // debug
 
     // ssd_mobilenetv1 options
-    this.minConfidence = 0.5
+    this.minConfidence = 0.5;
 
     // tiny_face_detector options
-    this.inputSize = 512
-    this.scoreThreshold = 0.5
+    this.inputSize = 512;
+    this.scoreThreshold = 0.5;
 
     //mtcnn options
-    this.minFaceSize = 20
+    this.minFaceSize = 20;
   }
 
   face.prototype = proto =
@@ -114,6 +114,7 @@
         async expressions() {
           let result = await faceapi.detectSingleFace(input, detectorOptions).withFaceLandmarks().withFaceExpressions();
           if (result) {
+            self.showCanvasInfo(input, result, {expressions: true});
             let expressions = result.expressions;
             let val = Object.keys(expressions).reduce((cur, key) => {
               cur = expressions[key] > expressions[cur] ? key : cur;
@@ -125,6 +126,7 @@
         },
         async descriptor() {
           let result = await faceapi.detectSingleFace(input, detectorOptions).withFaceLandmarks().withFaceDescriptor();
+          self.showCanvasInfo(input, result);
           if (result) {
             return result.descriptor;
           }
@@ -180,6 +182,7 @@
         this.fpsInfo(Date.now() - ts);
 
         if (result) {
+          this.showCanvasInfo(input, result, {expressions: true});
           let expressions = result.expressions;
           let val = Object.keys(expressions).reduce((cur, key) => {
             cur = expressions[key] > expressions[cur] ? key : cur;
@@ -271,6 +274,35 @@
     let idx = newString.findIndex(str => str === val);
     return oldString[idx];
   };
+
+  /**
+   * debug，用來實現，像官方範例那樣，框住人臉，並且出現相關資訊
+   * @param {object} input - HTMLVideoElement
+   * @param {object} result - 偵測後，得到的資訊
+   */
+  proto.showCanvasInfo = function (input, result, { expressions = false } = { expressions: false }) {
+    let isVideo = input instanceof HTMLVideoElement;
+    if (!this.debug || !result || !isVideo) return;
+    if (!this.canvas4debug) {
+      this.canvas4debug = document.createElement('canvas');
+      this.canvas4debug.style.cssText = 'position: absolute; top: 0px; left: 0px;';
+      input.parentNode.appendChild(this.canvas4debug);
+    }
+    let canvas = this.canvas4debug;
+    const dims = faceapi.matchDimensions(canvas, input, false); // 因為 video 實際大小不是內容的大小，所以第三個參數設為 false，即使 input 是 video 元素。
+    const resizedResult = faceapi.resizeResults(result, dims);
+
+    // 辨識人臉的機率
+    faceapi.draw.drawDetections(canvas, resizedResult);
+
+    // 顯示情緒
+    if (expressions) {
+      const minConfidence = 0.05
+      faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence);
+    }
+
+  };
+
 
   scope.module.face = face;
 }));

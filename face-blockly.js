@@ -13,8 +13,7 @@
       c1.width = width;
       c1.height = height;
       div.appendChild(c1);
-      div.style.overflow = 'hidden';
-      div.style.display = 'inline-block';
+      div.style.cssText = 'overflow: hidden; display: inline-block; position: relative;';
       document.body.appendChild(div);
       let cam = new Webcam();
       if (rotate) {
