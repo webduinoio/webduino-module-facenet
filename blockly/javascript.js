@@ -33,7 +33,7 @@ Blockly.JavaScript['face_get_camera'] = function (block) {
   var variable_camera = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('camera'), Blockly.Variables.NAME_TYPE);
   var checkbox_rotate = block.getFieldValue('rotate') == 'TRUE';
   var text_src = block.getFieldValue('src');
-  var code = variable_camera + ' = createCamera("' + text_src + '",224,224,' + checkbox_rotate + ', function(img){\n';
+  var code = variable_camera + ' = createCamera("' + text_src + '",300,225,' + checkbox_rotate + ', function(img){\n';
   code += '  ' + variable_camera + ".blobData = img;\n";
   code += '});\n';
   return code;
