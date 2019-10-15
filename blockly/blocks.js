@@ -5,7 +5,8 @@ Blockly.Blocks['face_load'] = {
       .appendField(new Blockly.FieldDropdown([
         ["SSDMobileNetV1", "0"],
         ["TinyFaceDetector", "1"],
-        ["MtCNN", "2"]
+        ["TinyYolov2Model", "2"],
+        ["MtCNN", "3"]
       ]), "model");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);

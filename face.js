@@ -383,6 +383,10 @@
 
   };
 
+  proto.setDebugMode = function (bol) {
+    this.debug = !!bol;
+  };
+
 
   scope.module.face = face;
 }));
