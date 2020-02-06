@@ -238,7 +238,8 @@
       let handler = async function() {
         let result = await faceapi.detectSingleFace(input, detectorOptions).withFaceLandmarks();
         if (result && result.landmarks && result.landmarks.positions) {
-          return result.landmarks.positions[index] && result.landmarks.positions[index][type] || null;
+          let val = result.landmarks.positions[index] && result.landmarks.positions[index][type] || null;
+          return Math.round(val);
         }
         return null;
       };
