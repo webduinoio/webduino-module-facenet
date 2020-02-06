@@ -220,7 +220,7 @@
     if (this.processing
       || !image
       || (image instanceof HTMLVideoElement && (image.paused || image.ended))) {
-      return this.lastLandmarks;
+      return this.lastLandmarks && Math.round(this.lastLandmarks[index][type]) || null;
     }
 
     this.processing = true;
@@ -237,22 +237,23 @@
       let detectorOptions = this.getFaceDetectorOptions();
       let handler = async function() {
         let result = await faceapi.detectSingleFace(input, detectorOptions).withFaceLandmarks();
-        if (result && result.landmarks && result.landmarks.positions) {
-          let val = result.landmarks.positions[index] && result.landmarks.positions[index][type] || null;
-          return Math.round(val);
+        if (result && result.landmarks) {
+          return result.landmarks.positions;
         }
         return null;
       };
 
       let data = await handler();
-      this.lastLandmarks = data;
+
       this.processing = false;
-      return data;
+      if (data) {
+        this.lastLandmarks = data;
+      }
     } catch(e) {
       console.warn("face getLandmarks Error:", e);
       this.processing = false;
-      return this.lastLandmarks = null;
     }
+    return this.lastLandmarks[index] && Math.round(this.lastLandmarks[index][type]) || null;
   }
 
   proto.getAgeAndGender = async function (image) {
