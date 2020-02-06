@@ -216,6 +216,44 @@
     }
   };
 
+  proto.getLandmarks = async function (image, index, type) {
+    if (this.processing
+      || !image
+      || (image instanceof HTMLVideoElement && (image.paused || image.ended))) {
+      return this.lastLandmarks;
+    }
+
+    this.processing = true;
+
+    // 處理 input
+    let tmpData = ("" + image);
+    if (tmpData.split(',').length == 128) {
+      return tmpData.split(',');
+    }
+    let input = await handleImage(image);
+
+    // 開始偵測
+    try {
+      let detectorOptions = this.getFaceDetectorOptions();
+      let handler = async function() {
+        let result = await faceapi.detectSingleFace(input, detectorOptions).withFaceLandmarks();
+        if (result && result.landmarks && result.landmarks.positions) {
+          return result.landmarks.positions[index] && result.landmarks.positions[index][type] || null;
+        }
+        return null;
+      };
+
+      let data = await handler();
+      this.lastLandmarks = data;
+      this.processing = false;
+      return data;
+    } catch(e) {
+      console.warn("face getLandmarks Error:", e);
+      this.processing = false;
+      return this.lastLandmarks = null;
+    }
+  }
+
   proto.getAgeAndGender = async function (image) {
     if (this.processing
       || !image

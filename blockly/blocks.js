@@ -114,3 +114,30 @@ Blockly.Blocks['face_get_canvas'] = {
     this.setHelpUrl('https://webduino.io/');
   }
 };
+
+Blockly.Blocks['face_get_landmarks'] = {
+  init: function () {
+    let indexes = [];
+    let valType = [
+      ["X", "x"],
+      ["Y", "y"],
+    ];
+    for (let i = 0; i < 68; i++) {
+      let _i = i.toString();
+      indexes.push([_i, _i]);
+    }
+    this.appendValueInput("landmarks")
+      .setCheck("String")
+      .appendField("取得Landmarks")
+      .appendField("索引位置")
+      .appendField(new Blockly.FieldDropdown(indexes), "index")
+      .appendField("座標")
+      .appendField(new Blockly.FieldDropdown(valType), "val_type")
+      .appendField("：");
+    this.setInputsInline(false);
+    this.setOutput(true, null);
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('https://webduino.io/');
+  }
+};

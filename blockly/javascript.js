@@ -66,3 +66,11 @@ Blockly.JavaScript['face_get_canvas'] = function (block) {
   var code = variable_canvas + '.blobData';
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
+
+Blockly.JavaScript['face_get_landmarks'] = function (block) {
+  var face_URL = Blockly.JavaScript.valueToCode(block, 'landmarks', Blockly.JavaScript.ORDER_ATOMIC);
+  var dropdown_index = block.getFieldValue('index');
+  var dropdown_val_type = block.getFieldValue('val_type');
+  var code = "await faceAPI.getLandmarks(" + face_URL + ", " + dropdown_index + ", '" + dropdown_val_type + "')";
+  return [code, Blockly.JavaScript.ORDER_NONE];
+};
